@@ -1,0 +1,3 @@
+*.pyc
+astra.egg-info/
+dist/
