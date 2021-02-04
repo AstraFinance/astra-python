@@ -4,6 +4,10 @@ Detailed documentation available at https://docs.astra.finance.
 
 ## Getting Started
 
+# Installation
+
+`pip install astra-python`
+
 ```
 from astra import Astra
 
