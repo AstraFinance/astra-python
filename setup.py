@@ -12,7 +12,7 @@ if not version:
     raise RuntimeError('Cannot find version information')
 
 setuptools.setup(
-    name="astra",
+    name="astra-python",
     version=version,
     keywords='api, client, astra, plaid, dwolla',
     author="Astra, Inc.",
