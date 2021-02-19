@@ -47,6 +47,8 @@ the new package to Pypi, run the publish command.
 
 _*Warning: this command is final and will create a new astra release*_
 
+Use `__token__` for the username, and the Astra PyPI token as the password.
+
 ```bash
 make package-publish
 ```
