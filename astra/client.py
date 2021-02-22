@@ -6,7 +6,7 @@ import base64
 
 import requests
 
-from .exceptions import AstraAuthenticationException
+from .exceptions import AstraAuthenticationException, AstraException
 from .models import AstraUser, AstraUserIntent
 
 
@@ -14,18 +14,19 @@ class AstraHttpRequester(object):
     """
     Class for requesting the Astra API.
     """
-    def __init__(self):
+    def __init__(self, api_base):
         self.headers = {
             "Content-Type": "application/json",
             "Accept": "application/json",
         }
         self.version = "/v1"
+        self.base_url = api_base + self.version
 
     def get(self, url, headers=None):
         """
         Basic implementation of a GET request to the Astra API.
         """
-        url = self.version + url
+        url = self.base_url + url
         if headers is not None:
             self.headers.update(headers)
         response = requests.get(url, headers=self.headers)
@@ -35,7 +36,7 @@ class AstraHttpRequester(object):
         """
         Basic implementation of a POST request to the API.
         """
-        url = self.version + url
+        url = self.base_url + url
         if headers is not None:
             self.headers.update(headers)
         response = requests.post(url, data, headers=self.headers)
@@ -46,8 +47,8 @@ class AstraBasicAuthRequester(AstraHttpRequester):
     """
     Class for making requests to Astra endpoints that require Basic Authorization.
     """
-    def __init__(self, token):
-        super(AstraBasicAuthRequester, self).__init__(token)
+    def __init__(self, token, *args):
+        super(AstraBasicAuthRequester, self).__init__(token, *args)
         self.headers.update({
             "Authorization": "Basic %s" % token,
         })
@@ -57,8 +58,8 @@ class AstraOAuthRequester(AstraHttpRequester):
     """
     Class for initiating OAuth requests to the Astra API with a user's access token.
     """
-    def __init__(self, access_token):
-        super(AstraOAuthRequester, self).__init__(access_token)
+    def __init__(self, access_token, *args):
+        super(AstraOAuthRequester, self).__init__(access_token, *args)
         self.headers.update({
             "Authorization": "Bearer %s" % access_token,
         })
@@ -75,14 +76,26 @@ class Astra(object):
     astra_user_info = astra_client.retrieve_user(some_user_id)
     etc.
     """
-    def __init__(self, client_id=None, client_secret=None):
+    def __init__(self, client_id=None, client_secret=None, is_sandbox=True, test_mode=False):
         if not client_id:
             raise AstraAuthenticationException("Missing client_id.")
         if not client_secret:
             raise AstraAuthenticationException("Missing client_secret")
 
+        if is_sandbox and test_mode:
+            raise AstraException("is_sandbox and test_mode cannot both be True.")
+
         basic_auth_token = base64.b64encode("%s:%s" % (client_id, client_secret))
         self.basic_authorization_header = "Bearer %s" % basic_auth_token
+
+        if test_mode:
+            self.api_base = ""
+        elif is_sandbox:
+            self.api_base = "https://api-sandbox.astra.finance"
+        else:
+            self.api_base = "https://api.astra.finance"
+
+        self.basic_auth_requester = AstraBasicAuthRequester(self.basic_authorization_header, self.api_base)
 
     def retrieve_access_token(self, authorization_code, redirect_uri):
         # type: (str, str) -> str
@@ -134,8 +147,7 @@ class Astra(object):
             "redirect_uri": redirect_uri
         }
         headers = {"Content-Type": "application/x-www-form-urlencoded"}
-        response = AstraBasicAuthRequester(
-            self.basic_authorization_header).post(url, data, headers=headers)
+        response = self.basic_auth_requester.post(url, data, headers=headers)
         return response
 
     def retrieve_user(self, user_access_token):
@@ -152,7 +164,7 @@ class Astra(object):
         etc.
         """
         url = "/user"
-        response = AstraOAuthRequester(user_access_token).get(url)
+        response = AstraOAuthRequester(user_access_token, self.api_base).get(url)
         return AstraUser(**response)
 
     def create_user_intent(self, data):
