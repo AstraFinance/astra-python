@@ -89,7 +89,7 @@ class Astra(object):
         self.basic_authorization_header = "Bearer %s" % basic_auth_token
 
         if test_mode:
-            self.api_base = ""
+            self.api_base = "http://localhost:8000"
         elif is_sandbox:
             self.api_base = "https://api-sandbox.astra.finance"
         else:
