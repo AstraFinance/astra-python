@@ -14,7 +14,7 @@ class AstraHttpRequester(object):
     """
     Class for requesting the Astra API.
     """
-    def __init__(self, api_base):
+    def __init__(self, api_base, *_args):
         self.headers = {
             "Content-Type": "application/json",
             "Accept": "application/json",
@@ -47,8 +47,8 @@ class AstraBasicAuthRequester(AstraHttpRequester):
     """
     Class for making requests to Astra endpoints that require Basic Authorization.
     """
-    def __init__(self, token, *args):
-        super(AstraBasicAuthRequester, self).__init__(token, *args)
+    def __init__(self, api_base, token):
+        super(AstraBasicAuthRequester, self).__init__(api_base, token)
         self.headers.update({
             "Authorization": "Basic %s" % token,
         })
@@ -117,8 +117,7 @@ class Astra(object):
             "redirect_uri": redirect_uri
         }
         headers = {"Content-Type": "application/x-www-form-urlencoded"}
-        response = AstraBasicAuthRequester(
-            self.basic_authorization_header).post(url, data, headers=headers)
+        response = self.basic_auth_requester.post(url, data, headers=headers)
         return response
 
     def refresh_access_token(self, refresh_token, redirect_uri):
@@ -195,5 +194,5 @@ class Astra(object):
         etc.
         """
         url = "/user_intent"
-        response = AstraBasicAuthRequester(self.basic_authorization_header).post(url, data)
+        response = self.basic_auth_requester.post(url, data)
         return AstraUserIntent(**response)

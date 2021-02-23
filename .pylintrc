@@ -21,6 +21,7 @@ disable=
   too-many-public-methods,
   too-many-return-statements,
   ungrouped-imports,  # Covered by isort
+  useless-object-inheritance,
   wrong-import-order,  # Covered by isort
   wrong-import-position  # Covered by isort
 
