@@ -95,7 +95,7 @@ class Astra(object):
         else:
             self.api_base = "https://api.astra.finance"
 
-        self.basic_auth_requester = AstraBasicAuthRequester(self.basic_authorization_header, self.api_base)
+        self.basic_auth_requester = AstraBasicAuthRequester(self.api_base, self.basic_authorization_header)
 
     def retrieve_access_token(self, authorization_code, redirect_uri):
         # type: (str, str) -> str
