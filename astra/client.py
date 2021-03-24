@@ -22,14 +22,19 @@ class AstraHttpRequester(object):
         self.version = "/v1"
         self.base_url = api_base + self.version
 
+    def update_headers(self, headers):
+        headers_copy = self.headers.copy()
+        headers_copy.update(headers)
+        return headers_copy
+
     def get(self, url, headers=None):
         """
         Basic implementation of a GET request to the Astra API.
         """
-        url = self.base_url + url
         if headers is not None:
-            self.headers.update(headers)
-        response = requests.get(url, headers=self.headers)
+            headers = self.update_headers(headers)
+        url = self.base_url + url
+        response = requests.get(url, headers=headers)
         return response.json()
 
     def post(self, url, data, headers=None):
@@ -39,7 +44,7 @@ class AstraHttpRequester(object):
         url = self.base_url + url
         if headers is not None:
             self.headers.update(headers)
-        response = requests.post(url, data, headers=self.headers)
+        response = requests.post(url, json=data, headers=self.headers)
         return response.json()
 
 
