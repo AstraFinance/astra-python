@@ -38,7 +38,7 @@ class AstraHttpRequester(object):
         if headers is not None:
             headers = self.update_headers(headers)
         url = self.base_url + url
-        response = requests.get(url, headers=headers)
+        response = requests.get(url, headers=self.headers)
         return response.json()
 
     def post(self, url, data, headers=None):
