@@ -23,6 +23,10 @@ class AstraHttpRequester(object):
         self.base_url = api_base + self.version
 
     def update_headers(self, headers):
+        # type: (dict) -> dict
+        """
+        Helper function to update headers for individual requests.
+        """
         headers_copy = self.headers.copy()
         headers_copy.update(headers)
         return headers_copy
@@ -169,6 +173,22 @@ class Astra(object):
         url = "/user"
         response = AstraOAuthRequester(user_access_token, self.api_base).get(url)
         return AstraUser(**response)
+
+    def retrieve_user_intent(self, user_intent_id):
+        # type: (str) -> AstraUserIntent
+        """
+        Retrieve information about a UserIntent using the UserIntent id.
+
+        Example:
+
+        astra = Astra(client_id, client_secret)
+        user_intent = astra.retrieve_user_intent(user_intent_id)
+        user_intent_status = user_intent.status
+        etc.
+        """
+        url = "/user_intent/%s" % user_intent_id
+        response = self.basic_auth_requester.get(url)
+        return AstraUserIntent(**response)
 
     def create_user_intent(self, data):
         # type: (dict) -> AstraUserIntent
