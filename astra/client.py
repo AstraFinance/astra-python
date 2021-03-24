@@ -191,7 +191,7 @@ class Astra(object):
         return AstraUserIntent(**response)
 
     def create_user_intent(self, data):
-        # type: (dict) -> AstraUserIntent
+        # type: (dict) -> str
         """
         Retrieve information about a user from their access token.
 
@@ -213,10 +213,9 @@ class Astra(object):
             "ssn": "9999",
             "ip_address": "79.245.299.113",
         }
-        astra_user_intent_data = astra.create_user_intent(user_intent_data)
-        astra_user_intent_status = astra_user_intent_data.status
-        etc.
+        astra_user_intent_id = astra.create_user_intent(user_intent_data)
+        # Save the user_intent_id to the database.
         """
         url = "/user_intent"
         response = self.basic_auth_requester.post(url, data)
-        return AstraUserIntent(**response)
+        return response['id']
