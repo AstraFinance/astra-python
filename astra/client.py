@@ -91,7 +91,6 @@ class Astra(object):
             raise AstraException("is_sandbox and test_mode cannot both be True.")
 
         basic_auth_token = base64.b64encode("%s:%s" % (client_id, client_secret))
-        self.basic_authorization_header = "Bearer %s" % basic_auth_token
 
         if test_mode:
             self.api_base = "http://localhost:8000"
@@ -100,7 +99,7 @@ class Astra(object):
         else:
             self.api_base = "https://api.astra.finance"
 
-        self.basic_auth_requester = AstraBasicAuthRequester(self.api_base, self.basic_authorization_header)
+        self.basic_auth_requester = AstraBasicAuthRequester(self.api_base, basic_auth_token)
 
     def retrieve_access_token(self, authorization_code, redirect_uri):
         # type: (str, str) -> str
