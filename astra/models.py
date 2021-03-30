@@ -3,6 +3,9 @@ Module for models of Astra objects
 TODO: Will this instantiation work with the JSON response from `requests`?
 TODO: Add validation and helpful errors in the event of invalid data.
 """
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class AstraUserIntent(object):
@@ -11,7 +14,10 @@ class AstraUserIntent(object):
     """
     def __init__(self, **kwargs):
         # TODO: Will this instantiation work with the JSON response?
-        self.id = kwargs["id"]
+        try:
+            self.id = kwargs["id"]
+        except KeyError:
+            logger.error("ASTRA SDK ERROR: %s", kwargs)
         self.email = kwargs["email"]
         self.phone = kwargs["phone"]
         self.first_name = kwargs["first_name"]
